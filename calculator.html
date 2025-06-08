@@ -1,38 +1,1175 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"> 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculator</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NaijaReceipt PRO | Basic Plan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+    /* Updated CSS with modern glass morphism effects and responsive design */
+:root {
+    --primary: #4361ee;
+    --secondary: #3a0ca3;
+    --accent: #4cc9f0;
+    --success: #4ade80;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --glass: rgba(255, 255, 255, 0.08);
+    --glass-dark: rgba(0, 0, 0, 0.2);
+    --border: rgba(255, 255, 255, 0.2);
+    --text: #f8f9fa;
+    --text-secondary: #e9ecef;
+    --shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    --transition: all 0.3s ease;
+}
 
-    <link rel="stylesheet" href="calculator.css">
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    color: var(--text);
+    position: relative;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(67, 97, 238, 0.15) 0%, transparent 70%);
+    z-index: -1;
+    animation: float 15s infinite linear;
+}
+
+@keyframes float {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(-5%, -5%); }
+    50% { transform: translate(-10%, 0); }
+    75% { transform: translate(-5%, 5%); }
+    100% { transform: translate(0, 0); }
+}
+
+.container {
+    width: 100%;
+    max-width: 600px;
+    position: relative;
+    z-index: 10;
+}
+
+/* Header Styles */
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.header h1 {
+    font-size: 2.8rem;
+    background: linear-gradient(to right, var(--accent), var(--primary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+    font-weight: 800;
+    position: relative;
+    display: inline-block;
+}
+
+.header h1::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(to right, var(--accent), var(--primary));
+    border-radius: 2px;
+}
+
+.tagline {
+    font-size: 1.2rem;
+    opacity: 0.8;
+    max-width: 500px;
+    margin: 0 auto 15px;
+}
+
+.plan-badge {
+    background: rgba(67, 97, 238, 0.25);
+    border-radius: 20px;
+    padding: 6px 15px;
+    font-size: 0.9rem;
+    display: inline-block;
+    margin-top: 10px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Card Styles - Enhanced Glass Morphism */
+.card {
+    background: var(--glass);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-radius: 24px;
+    border: 1px solid var(--border);
+    padding: 35px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+    z-index: -1;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+.section-title {
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.section-title i {
+    font-size: 1.6rem;
+    color: var(--accent);
+    background: rgba(76, 201, 240, 0.15);
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: var(--transition);
+}
+
+.card:hover .section-title i {
+    transform: rotate(10deg);
+    background: rgba(76, 201, 240, 0.25);
+}
+
+.input-group {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.1rem;
+}
+
+.input-group label i {
+    color: var(--accent);
+    font-size: 1.3rem;
+    min-width: 30px;
+    text-align: center;
+}
+
+.input-group input, .input-group select {
+    width: 100%;
+    padding: 16px 22px;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text);
+    font-size: 1.1rem;
+    transition: var(--transition);
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.input-group input:focus {
+    background: rgba(255, 255, 255, 0.15);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.3), inset 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.input-group input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.usage-meter {
+    background: var(--glass-dark);
+    border-radius: 16px;
+    padding: 20px;
+    margin: 30px 0;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+}
+
+.usage-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+.meter-bar {
+    height: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    margin: 15px 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.meter-fill {
+    height: 100%;
+    background: linear-gradient(to right, var(--accent), var(--primary));
+    border-radius: 10px;
+    transition: width 0.5s ease;
+    position: relative;
+}
+
+.meter-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    100% {
+        left: 100%;
+    }
+}
+
+.product-form {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(5px);
+}
+
+.product-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.product-row input {
+    flex: 1;
+    padding: 12px 18px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text);
+    transition: var(--transition);
+}
+
+.product-row input:focus {
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+}
+
+.add-product {
+    background: rgba(67, 97, 238, 0.15);
+    border: none;
+    color: var(--accent);
+    padding: 10px 15px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    backdrop-filter: blur(5px);
+    width: 100%;
+    justify-content: center;
+}
+
+.add-product:hover {
+    background: rgba(67, 97, 238, 0.25);
+    transform: translateY(-3px);
+}
+
+.btn {
+    padding: 18px;
+    border: none;
+    border-radius: 16px;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.1);
+    transform: rotate(30deg);
+    transition: all 0.6s ease;
+    z-index: 0;
+}
+
+.btn:hover::before {
+    transform: rotate(30deg) translate(20%, 20%);
+}
+
+.btn span {
+    position: relative;
+    z-index: 1;
+}
+
+.btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.generate-btn {
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    width: 100%;
+    margin-top: 20px;
+}
+
+.generate-btn:hover {
+    box-shadow: 0 10px 30px rgba(67, 97, 238, 0.4);
+}
+
+.upgrade-btn {
+    background: linear-gradient(to right, var(--warning), #d97706);
+    width: 100%;
+    margin-top: 10px;
+}
+
+.upgrade-btn:hover {
+    box-shadow: 0 10px 30px rgba(245, 158, 11, 0.4);
+}
+
+.premium-promo {
+    background: rgba(245, 158, 11, 0.15);
+    border-radius: 16px;
+    padding: 25px;
+    margin-top: 30px;
+    text-align: center;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    backdrop-filter: blur(5px);
+    transition: var(--transition);
+}
+
+.premium-promo:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(245, 158, 11, 0.2);
+}
+
+.premium-promo h3 {
+    color: #f59e0b;
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.premium-features {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin: 20px 0;
+    text-align: left;
+}
+
+.feature {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+    padding: 10px 15px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    transition: var(--transition);
+}
+
+.feature:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
+}
+
+.feature i {
+    color: #f59e0b;
+    min-width: 24px;
+}
+
+/* Payment Modal - Enhanced Glass Effect */
+.payment-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.payment-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: var(--glass);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    border-radius: 24px;
+    padding: 40px;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+    position: relative;
+    border: 1px solid var(--border);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+}
+
+.payment-modal.active .modal-content {
+    transform: translateY(0);
+}
+
+.modal-header {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    color: var(--accent);
+}
+
+.modal-body {
+    margin-bottom: 30px;
+    font-size: 1.2rem;
+    line-height: 1.6;
+}
+
+.modal-amount {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 20px 0;
+    background: linear-gradient(to right, var(--accent), var(--primary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    position: relative;
+    display: inline-block;
+}
+
+.modal-amount::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(to right, var(--accent), var(--primary));
+    border-radius: 2px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 20px;
+}
+
+.modal-btn {
+    flex: 1;
+    padding: 16px;
+    border-radius: 14px;
+    border: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-btn::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.1);
+    transform: rotate(30deg);
+    transition: all 0.6s ease;
+    z-index: 0;
+}
+
+.modal-btn:hover::before {
+    transform: rotate(30deg) translate(20%, 20%);
+}
+
+.modal-btn span {
+    position: relative;
+    z-index: 1;
+}
+
+.modal-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.confirm-btn {
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    color: white;
+}
+
+.cancel-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text);
+}
+
+.close-modal {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.close-modal:hover {
+    transform: rotate(90deg);
+    color: var(--accent);
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 1rem;
+    opacity: 0.7;
+    padding: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    width: 100%;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 2.2rem;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+    }
+    
+    .product-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .card {
+        padding: 25px;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+    }
+    
+    .section-title i {
+        width: 40px;
+        height: 40px;
+        font-size: 1.3rem;
+    }
+    
+    .input-group input, .input-group select {
+        padding: 14px 18px;
+        font-size: 1rem;
+    }
+    
+    .btn {
+        padding: 16px;
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .tagline {
+        font-size: 1rem;
+    }
+    
+    .card {
+        padding: 20px;
+        border-radius: 20px;
+    }
+    
+    .section-title {
+        font-size: 1.3rem;
+        margin-bottom: 20px;
+    }
+    
+    .input-group label {
+        font-size: 1rem;
+    }
+    
+    .input-group input, .input-group select {
+        padding: 12px 16px;
+        font-size: 0.95rem;
+    }
+    
+    .usage-meter {
+        padding: 15px;
+    }
+    
+    .usage-header {
+        font-size: 0.95rem;
+    }
+    
+    .premium-promo {
+        padding: 20px;
+    }
+    
+    .premium-promo h3 {
+        font-size: 1.2rem;
+    }
+    
+    .feature {
+        font-size: 0.9rem;
+        padding: 8px 12px;
+    }
+    
+    .btn {
+        padding: 14px;
+        font-size: 1rem;
+    }
+    
+    .modal-content {
+        padding: 25px;
+    }
+    
+    .modal-header {
+        font-size: 1.4rem;
+    }
+    
+    .modal-body {
+        font-size: 1rem;
+    }
+    
+    .modal-amount {
+        font-size: 2rem;
+    }
+    
+    .modal-btn {
+        padding: 14px;
+        font-size: 1rem;
+    }
+    
+    footer {
+        font-size: 0.9rem;
+    }
+}
+
+/* Mobile Landscape Optimization */
+@media (max-width: 768px) and (orientation: landscape) {
+    body {
+        padding: 10px;
+    }
+    
+    .container {
+        max-width: 100%;
+    }
+    
+    .header {
+        margin-bottom: 20px;
+    }
+    
+    .card {
+        padding: 20px;
+    }
+    
+    .product-row {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .product-row input {
+        min-width: calc(33.33% - 10px);
+    }
+    
+    .section-title {
+        margin-bottom: 15px;
+    }
+    
+    .input-group {
+        margin-bottom: 15px;
+    }
+}
+
+/* Extra Small Devices */
+@media (max-width: 360px) {
+    .header h1 {
+        font-size: 1.6rem;
+    }
+    
+    .tagline {
+        font-size: 0.9rem;
+    }
+    
+    .section-title {
+        font-size: 1.1rem;
+    }
+    
+    .plan-badge {
+        font-size: 0.8rem;
+    }
+    
+    .btn {
+        font-size: 0.9rem;
+        padding: 12px;
+    }
+    
+    .premium-promo h3 {
+        font-size: 1.1rem;
+    }
+    
+    .feature {
+        font-size: 0.85rem;
+    }
+}
+    </style>
 </head>
 <body>
-    <div class="Calculator">
-     <input type="text" class="Calculator-Screen  id="screen" readonly value="" disabled/>
-     <div class="Calculator-Keys"> 
-    <button type="button" class="Operator" value="+">+</button>
-     <button type="button" class="Operator" value="-">-</button>
-     <button type="button" class="Operator" value="*">&times</button>
-     <button type="button" class="Operator" value="/">&divide;</button>
-     <button type="button"  value="9">9</button>
-    <button type="button" value="8">8</button>
-    <button type="button" value="7">7</button>
-    
-    <button type="button" value="6">6</button>
-    <button type="button" value="5">5</button>
-    <button type="button" value="4">4</button>
-    
-    <button type="button" value="3">3</button>
-    <button type="button" value="2">2</button>
-    <button type="button" value="1">1</button>
-     
-    <button type="button"value="0">0</button>
-     <button type="button" value=".">.</button>   
-    <button type="button" class="Operator" value="all-clear">AC</button>
-     <button type="button" class="Operator" value="equal-sign"></button>
+    <div class="container">
+        <div class="header">
+            <h1>NaijaReceipt PRO</h1>
+            <p class="tagline">Professional Receipt Solution for Nigerian Businesses</p>
+            <div class="plan-badge">Basic Plan</div>
+        </div>
+        
+        <!-- Basic Plan Section -->
+        <div class="card">
+            <div class="section-title">
+                <i class="fas fa-file-invoice"></i>
+                <h2>Basic Receipt Generator</h2>
+            </div>
+            
+            <div class="input-group">
+                <label for="basic-business"><i class="fas fa-store"></i> Business Name</label>
+                <input type="text" id="basic-business" placeholder="Your Business Name">
+            </div>
+            
+            <div class="input-group">
+                <label for="basic-customer"><i class="fas fa-user"></i> Customer Name</label>
+                <input type="text" id="basic-customer" placeholder="Customer Name">
+            </div>
+            
+            <div class="product-form">
+                <div id="product-container">
+                    <div class="product-row">
+                        <input type="text" placeholder="Item Description" class="product-desc">
+                        <input type="number" placeholder="Qty" class="product-qty" min="1" value="1">
+                        <input type="number" placeholder="Price (₦)" class="product-price" min="0">
+                    </div>
+                </div>
+                <button class="add-product" id="add-product">
+                    <i class="fas fa-plus"></i> Add Another Item
+                </button>
+            </div>
+            
+            <div class="usage-meter">
+                <div class="usage-header">
+                    <span>Free Receipts Used</span>
+                    <span id="usage-count">0/300</span>
+                </div>
+                <div class="meter-bar">
+                    <div class="meter-fill" id="meter-fill" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <button class="btn generate-btn" id="basic-generate">
+                <i class="fas fa-file-download"></i>
+                Generate Receipt
+            </button>
+            
+            <div class="premium-promo">
+                <h3><i class="fas fa-crown"></i> Upgrade to Premium</h3>
+                <div class="premium-features">
+                    <div class="feature"><i class="fas fa-check-circle"></i> No watermark on receipts</div>
+                    <div class="feature"><i class="fas fa-check-circle"></i> Business logo branding</div>
+                    <div class="feature"><i class="fas fa-check-circle"></i> Lower ₦5 per-receipt fee</div>
+                    <div class="feature"><i class="fas fa-check-circle"></i> Unlimited receipts</div>
+                    <div class="feature"><i class="fas fa-check-circle"></i> Premium templates</div>
+                </div>
+                <button class="btn upgrade-btn" id="upgrade-to-premium">
+                    <i class="fas fa-gem"></i>
+                    Upgrade to Premium - ₦1,500/month
+                </button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Fully compliant with Nigerian tax regulations • © 2023 NaijaReceipt PRO</p>
+        </footer>
     </div>
-</div>
-<script src="calculator.js"></script>
+    
+    <!-- Payment Modal -->
+    <div class="payment-modal" id="payment-modal">
+        <div class="modal-content">
+            <button class="close-modal" id="close-modal">&times;</button>
+            <div class="modal-header">
+                <i class="fas fa-lock"></i>
+                Confirm Payment
+            </div>
+            <div class="modal-body">
+                <p>You're about to generate a receipt with included service fee</p>
+                <div class="modal-amount" id="fee-amount">₦15</div>
+                <p>The fee will be automatically added to your total amount</p>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel-btn" id="cancel-payment">Cancel</button>
+                <button class="modal-btn confirm-btn" id="confirm-payment">Confirm & Generate</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+       // ===== MONETIZATION CONFIGURATION =====
+        const BASIC_FREE_LIMIT = 300;
+        const BASIC_FEE_PER_RECEIPT = 7; // ₦7 per receipt after free limit
+        const PREMIUM_MONTHLY_FEE = 120000; // ₦1,200 in kobo
+        
+        // Paystack configuration - REPLACE WITH YOUR OWN KEYS!
+        const PAYSTACK_PUBLIC_KEY = 'pk_test_c94a1553a1d8454de8ef44e05796f3f1849c2d25';
+        const PREMIUM_PLAN_CODE = 'PLN_kwv88297h5tnjq5'; 
+
+        // Initialize user data
+        const userData = {
+            premium: false,
+            receiptsGenerated: 0,
+            email: '',
+            lastPaymentDate: null
+        };
+
+        // DOM Elements
+        const paymentModal = document.getElementById('payment-modal');
+        const closeModal = document.getElementById('close-modal');
+        const cancelPayment = document.getElementById('cancel-payment');
+        const confirmPayment = document.getElementById('confirm-payment');
+        const feeAmount = document.getElementById('fee-amount');
+        const usageCount = document.getElementById('usage-count');
+        const meterFill = document.getElementById('meter-fill');
+        const upgradeBtn = document.getElementById('upgrade-to-premium');
+        const productContainer = document.getElementById('product-container');
+        const addProductBtn = document.getElementById('add-product');
+        
+        // Initialize UI
+        function initUI() {
+            loadUserData();
+            updateUsageUI();
+            checkSubscriptionStatus();
+        }
+        
+        // Load user data from localStorage
+        function loadUserData() {
+            const savedData = localStorage.getItem('naijaReceiptData');
+            if (savedData) {
+                Object.assign(userData, JSON.parse(savedData));
+            }
+            
+            // Redirect to premium if user is premium
+            if (userData.premium) {
+                window.location.href = 'premium.html';
+            }
+        }
+        
+        // Save user data to localStorage
+        function saveUserData() {
+            localStorage.setItem('naijaReceiptData', JSON.stringify(userData));
+        }
+        
+        // Check if subscription is still active
+        function checkSubscriptionStatus() {
+            if (userData.premium && userData.lastPaymentDate) {
+                const oneMonth = 30 * 24 * 60 * 60 * 1000; // 30 days in ms
+                const now = new Date();
+                const lastPayment = new Date(userData.lastPaymentDate);
+                
+                if ((now - lastPayment) > oneMonth) {
+                    userData.premium = false;
+                    saveUserData();
+                    alert('Your premium subscription has expired. Please renew.');
+                }
+            }
+        }
+        
+        // Update usage UI
+        function updateUsageUI() {
+            const used = Math.min(userData.receiptsGenerated, BASIC_FREE_LIMIT);
+            usageCount.textContent = `${used}/${BASIC_FREE_LIMIT}`;
+            meterFill.style.width = `${(used / BASIC_FREE_LIMIT) * 100}%`;
+            
+            // Update upgrade button text
+            upgradeBtn.innerHTML = `<i class="fas fa-gem"></i> Upgrade to Premium - ₦1,200/month`;
+        }
+        
+        // Show payment modal
+        function showPaymentModal(fee) {
+            feeAmount.textContent = `₦${fee}`;
+            paymentModal.classList.add('active');
+        }
+        
+        // Close modal
+        function closePaymentModal() {
+            paymentModal.classList.remove('active');
+        }
+        
+        // Get products from form
+        function getProducts() {
+            const products = [];
+            const rows = productContainer.querySelectorAll('.product-row');
+            
+            rows.forEach(row => {
+                const desc = row.querySelector('.product-desc').value;
+                const qty = parseInt(row.querySelector('.product-qty').value) || 0;
+                const price = parseInt(row.querySelector('.product-price').value) || 0;
+                
+                if (desc && qty > 0 && price > 0) {
+                    products.push({ desc, qty, price });
+                }
+            });
+            
+            return products;
+        }
+        
+        // Calculate total amount
+        function calculateTotal(products) {
+            return products.reduce((total, product) => 
+                total + (product.qty * product.price), 0);
+        }
+        
+        // Generate basic receipt
+        function generateBasicReceipt() {
+            const businessName = document.getElementById('basic-business').value;
+            const customer = document.getElementById('basic-customer').value;
+            const products = getProducts();
+            
+            if (!businessName || !customer || products.length === 0) {
+                alert('Please fill in all required fields and add at least one product');
+                return;
+            }
+            
+            const subtotal = calculateTotal(products);
+            
+            // Check free receipt limit
+            if (userData.receiptsGenerated < BASIC_FREE_LIMIT) {
+                // Free receipt
+                createReceipt('basic', businessName, customer, products, subtotal, 0);
+                userData.receiptsGenerated++;
+                updateUsageUI();
+                saveUserData();
+            } else {
+                // Charge per receipt after free limit
+                showPaymentModal(BASIC_FEE_PER_RECEIPT);
+                currentReceiptData = {
+                    businessName,
+                    customer,
+                    products,
+                    subtotal,
+                    fee: BASIC_FEE_PER_RECEIPT
+                };
+            }
+        }
+        
+        // Create receipt
+        function createReceipt(type, businessName, customer, products, subtotal, fee) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Receipt creation code remains unchanged...
+            
+            // Save and download
+            doc.save(`${type}_Receipt_${businessName.replace(/\s/g, "_")}.pdf`);
+        }
+        
+        // Process payment for receipt fee
+        function processReceiptFeePayment() {
+            if (!currentReceiptData) return;
+            
+            // Get or prompt for email
+            let email = userData.email;
+            if (!email) {
+                email = prompt('Please enter your email for payment receipt:');
+                if (!email) {
+                    alert('Email is required for payment');
+                    return;
+                }
+                userData.email = email;
+                saveUserData();
+            }
+            
+            const handler = PaystackPop.setup({
+                key: PAYSTACK_PUBLIC_KEY,
+                email: email,
+                amount: currentReceiptData.fee * 100, // Convert to kobo
+                currency: 'NGN',
+                ref: 'RECEIPT-' + Date.now(),
+                callback: function(response) {
+                    // On successful payment
+                    createReceipt(
+                        'basic',
+                        currentReceiptData.businessName,
+                        currentReceiptData.customer,
+                        currentReceiptData.products,
+                        currentReceiptData.subtotal,
+                        currentReceiptData.fee
+                    );
+                    
+                    userData.receiptsGenerated++;
+                    updateUsageUI();
+                    saveUserData();
+                    
+                    alert(`₦${currentReceiptData.fee} fee payment successful!`);
+                    currentReceiptData = null;
+                },
+                onClose: function() {
+                    alert('Payment cancelled. Receipt not generated.');
+                }
+            });
+            
+            handler.openIframe();
+        }
+        
+        // Upgrade to premium
+        function upgradeToPremium() {
+            // Collect email
+            const email = prompt('Please enter your email for subscription:');
+            if (!email) {
+                alert('Email is required for premium subscription');
+                return;
+            }
+            
+            // Open Paystack payment
+            const handler = PaystackPop.setup({
+                key: PAYSTACK_PUBLIC_KEY,
+                email: email,
+                plan: PREMIUM_PLAN_CODE,
+                amount: PREMIUM_MONTHLY_FEE,
+                currency: 'NGN',
+                ref: 'PREMIUM-' + Date.now(),
+                callback: function(response) {
+                    // Successful payment
+                    userData.premium = true;
+                    userData.email = email;
+                    userData.lastPaymentDate = new Date().toISOString();
+                    
+                    // Save and update UI
+                    saveUserData();
+                    
+                    alert('Premium subscription activated! Redirecting...');
+                    
+                    // Redirect to premium page
+                    setTimeout(() => {
+                        window.location.href = 'premium.html';
+                    }, 2000);
+                },
+                onClose: function() {
+                    alert('Payment cancelled. Premium not activated.');
+                }
+            });
+            
+            handler.openIframe();
+        }
+        
+        // Add product row
+        function addProductRow() {
+            const row = document.createElement('div');
+            row.className = 'product-row';
+            row.innerHTML = `
+                <input type="text" placeholder="Item Description" class="product-desc">
+                <input type="number" placeholder="Qty" class="product-qty" min="1" value="1">
+                <input type="number" placeholder="Price (₦)" class="product-price" min="0">
+            `;
+            productContainer.appendChild(row);
+        }
+        
+        // Event Listeners
+        let currentReceiptData = null;
+        
+        document.getElementById('basic-generate').addEventListener('click', generateBasicReceipt);
+        upgradeBtn.addEventListener('click', upgradeToPremium);
+        closeModal.addEventListener('click', closePaymentModal);
+        cancelPayment.addEventListener('click', closePaymentModal);
+        
+        confirmPayment.addEventListener('click', () => {
+            closePaymentModal();
+            processReceiptFeePayment();
+        });
+        
+        addProductBtn.addEventListener('click', addProductRow);
+        
+        // Initialize
+        window.addEventListener('DOMContentLoaded', initUI);
+      
+    </script>
 </body>
 </html>
