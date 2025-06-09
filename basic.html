@@ -839,7 +839,7 @@ footer {
             <div class="usage-meter">
                 <div class="usage-header">
                     <span>Free Receipts Used</span>
-                    <span id="usage-count">0/300</span>
+                    <span id="usage-count">0/30</span>
                 </div>
                 <div class="meter-bar">
                     <div class="meter-fill" id="meter-fill" style="width: 0%"></div>
@@ -882,7 +882,7 @@ footer {
             </div>
             <div class="modal-body">
                 <p>You're about to generate a receipt with included service fee</p>
-                <div class="modal-amount" id="fee-amount">₦15</div>
+                <div class="modal-amount" id="fee-amount">₦7</div>
                 <p>The fee will be automatically added to your total amount</p>
             </div>
             <div class="modal-actions">
@@ -893,10 +893,10 @@ footer {
     </div>
 
     <script>
-       // ===== MONETIZATION CONFIGURATION =====
-        const BASIC_FREE_LIMIT = 300;
+        // ===== MONETIZATION CONFIGURATION =====
+        const BASIC_FREE_LIMIT = 30; // Changed to 30
         const BASIC_FEE_PER_RECEIPT = 7; // ₦7 per receipt after free limit
-        const PREMIUM_MONTHLY_FEE = 120000; // ₦1,200 in kobo
+        const PREMIUM_MONTHLY_FEE = 150000; // ₦1,500 in kobo
         
         // Paystack configuration - REPLACE WITH YOUR OWN KEYS!
         const PAYSTACK_PUBLIC_KEY = 'pk_test_c94a1553a1d8454de8ef44e05796f3f1849c2d25';
@@ -968,8 +968,8 @@ footer {
             usageCount.textContent = `${used}/${BASIC_FREE_LIMIT}`;
             meterFill.style.width = `${(used / BASIC_FREE_LIMIT) * 100}%`;
             
-            // Update upgrade button text
-            upgradeBtn.innerHTML = `<i class="fas fa-gem"></i> Upgrade to Premium - ₦1,200/month`;
+            // Update upgrade button text to ₦1,500
+            upgradeBtn.innerHTML = `<i class="fas fa-gem"></i> Upgrade to Premium - ₦1,500/month`;
         }
         
         // Show payment modal
@@ -1169,7 +1169,6 @@ footer {
         
         // Initialize
         window.addEventListener('DOMContentLoaded', initUI);
-      
     </script>
 </body>
 </html>
