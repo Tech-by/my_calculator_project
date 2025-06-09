@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NaijaReceipt PRO | Premium Plan</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://js.paystack.co/v1/inline.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root {
@@ -100,7 +99,7 @@
         }
 
         .header h1 {
-            font-size: 3rem;
+            font-size: 2.8rem;
             background: linear-gradient(to right, var(--accent), #ffffff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -502,6 +501,27 @@
         .pulse {
             animation: pulse 2s infinite;
         }
+        
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
 
         /* Responsive */
         @media (max-width: 768px) {
@@ -585,20 +605,25 @@
             
             <div class="input-group">
                 <label for="premium-business"><i class="fas fa-store"></i> Business Name</label>
-                <input type="text" id="premium-business" placeholder="Your Business Name">
+                <input type="text" id="premium-business" placeholder="Your Business Name" value="Premium Business Ltd">
             </div>
             
             <div class="input-group">
                 <label for="premium-customer"><i class="fas fa-user"></i> Customer Name</label>
-                <input type="text" id="premium-customer" placeholder="Customer Name">
+                <input type="text" id="premium-customer" placeholder="Customer Name" value="John Doe">
             </div>
             
             <div class="product-form">
                 <div id="product-container">
                     <div class="product-row">
-                        <input type="text" placeholder="Item Description" class="product-desc">
+                        <input type="text" placeholder="Item Description" class="product-desc" value="Product A">
+                        <input type="number" placeholder="Qty" class="product-qty" min="1" value="2">
+                        <input type="number" placeholder="Price (₦)" class="product-price" min="0" value="5000">
+                    </div>
+                    <div class="product-row">
+                        <input type="text" placeholder="Item Description" class="product-desc" value="Service Fee">
                         <input type="number" placeholder="Qty" class="product-qty" min="1" value="1">
-                        <input type="number" placeholder="Price (₦)" class="product-price" min="0">
+                        <input type="number" placeholder="Price (₦)" class="product-price" min="0" value="1500">
                     </div>
                 </div>
                 <button class="add-product" id="add-product">
@@ -616,14 +641,17 @@
             <p>Fully compliant with Nigerian tax regulations • © 2025 NaijaReceipt PRO</p>
         </footer>
     </div>
+    
+    <div class="toast" id="toast">Receipt generated successfully!</div>
 
     <script>
-        // Initialize user data
-        const userData = {
+        // Initialize user data with localStorage for persistence
+        let userData = JSON.parse(localStorage.getItem('userData')) || {
             premium: true,
             logo: null,
-            premiumEndDate: '2025-06-30',
-            email: 'premium@example.com'
+            premiumEndDate: new Date(new Date().setFullYear(new Date().getFullYear(), 5, 30)).toISOString().split('T')[0],
+            businessName: "Premium Business Ltd",
+            customerName: "John Doe"
         };
 
         // DOM Elements
@@ -633,7 +661,10 @@
         const logoPreview = document.getElementById('logo-preview');
         const productContainer = document.getElementById('product-container');
         const addProductBtn = document.getElementById('add-product');
-        
+        const premiumBusiness = document.getElementById('premium-business');
+        const premiumCustomer = document.getElementById('premium-customer');
+        const toast = document.getElementById('toast');
+
         // Initialize UI
         function initUI() {
             // Update subscription info
@@ -645,7 +676,7 @@
                     day: 'numeric'
                 });
                 
-                // Check renewal alert (7 days before)
+                // Check renewal alert (15 days before)
                 const today = new Date();
                 const daysLeft = Math.floor((endDate - today) / (1000 * 60 * 60 * 24));
                 
@@ -655,6 +686,15 @@
                 } else {
                     renewAlert.style.display = 'none';
                 }
+            }
+            
+            // Update business info
+            premiumBusiness.value = userData.businessName;
+            premiumCustomer.value = userData.customerName;
+            
+            // Load logo if exists
+            if (userData.logo) {
+                logoPreview.innerHTML = `<img src="${userData.logo}" alt="Business Logo">`;
             }
             
             // Add animation to premium badge
@@ -682,34 +722,37 @@
         
         // Calculate total amount
         function calculateTotal(products) {
-            let subtotal = 0;
-            products.forEach(product => {
-                subtotal += product.qty * product.price;
-            });
-            return subtotal;
+            return products.reduce((total, product) => 
+                total + (product.qty * product.price), 0);
         }
         
         // Generate premium receipt
         function generatePremiumReceipt() {
-            const businessName = document.getElementById('premium-business').value;
-            const customer = document.getElementById('premium-customer').value;
+            const businessName = premiumBusiness.value;
+            const customer = premiumCustomer.value;
             const products = getProducts();
             
             if (!businessName || !customer || products.length === 0) {
-                alert('Please fill in all required fields and add at least one product');
+                showToast('Please fill in all fields and add at least one product');
                 return;
             }
             
-            const subtotal = calculateTotal(products);
+            // Update user data
+            userData.businessName = businessName;
+            userData.customerName = customer;
+            localStorage.setItem('userData', JSON.stringify(userData));
             
             // Create receipt without any fee
-            createReceipt(businessName, customer, products, subtotal);
+            createReceipt(businessName, customer, products);
+            showToast('Receipt generated successfully!');
         }
         
         // Create receipt
-        function createReceipt(businessName, customer, products, subtotal) {
+        function createReceipt(businessName, customer, products) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
+            
+            const subtotal = calculateTotal(products);
             
             // Create receipt
             doc.setFontSize(20);
@@ -791,7 +834,8 @@
                 reader.onload = function(e) {
                     userData.logo = e.target.result;
                     logoPreview.innerHTML = `<img src="${userData.logo}" alt="Business Logo">`;
-                    // Save user data in real implementation
+                    localStorage.setItem('userData', JSON.stringify(userData));
+                    showToast('Logo uploaded successfully!');
                 };
                 reader.readAsDataURL(file);
             }
@@ -807,6 +851,15 @@
                 <input type="number" placeholder="Price (₦)" class="product-price" min="0">
             `;
             productContainer.appendChild(row);
+        }
+        
+        // Show toast notification
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
         }
         
         // Event Listeners
